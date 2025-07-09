@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+{% load static %}
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+
+      <title>Profile</title>
+</head>
+<body class="bg-primary bg-opacity-25">
+
+    <nav class="navbar bg-dark navbar-dark py-3 fixed-top">
+        <div class="container">
+            <a href="#" class="navbar-brand">PetClinic</a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+
+            <div class="collapse navbar-collapse" id="navmenu">
+                <ul class="nav navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a href="/home" class="nav-link" ><i class="bi-house"></i>Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/profile" class="nav-link" ><i class="bi-person"></i>Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/nft" class="nav-link" >NFT</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/token" class="nav-link" >Token</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/signout" class="nav-link" >Exit</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+<br>
+<br>
+    <section class="p-5">
+        <div class="container">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+            <div class="row text-center g-4">
+                <div class="col-md-4">
+                  <img src="{{ profile.image.url }}" class="img-thumbnail " style="width: 200px" alt="...">
+                    <input class="pt-1" type="file" accept="image/*" style="width: 220px" name="profile_image" >
+                </div>
+
+              <div class="col-md-8 ">
+                <div>
+                    {% if profile.full_name %}
+                        <input type="text" required class="form-control text-center m-3 p-4" value="{{ profile.full_name }}" name="user_name" placeholder="Your name">
+                        <input type="date" required class="form-control text-center m-3 p-4" value="{{ profile.birth|date:'Y-m-d' }}" name="user_birth">
+                    {% else %}
+                        <input type="text" required class="form-control text-center m-3 p-4" name="user_name" placeholder="Your name">
+                        <input type="date" required class="form-control text-center m-3 p-4" name="user_birth">
+
+                    {% endif %}
+                    <button class="btn btn-secondary" type="submit" name="form_one">Edit</button>
+                </div>
+              </div>
+            </div>
+            </form>
+
+
+
+        </div>
+    </section>
+
+
+
+    <section class="p-5 ">
+      <div class="">
+      <h3 class="text-center">My Pets</h3>
+      <div style="overflow-x: auto ">
+        <table class="table table-primary border border border-dark rounded-pill">
+          <thead>
+            <tr class="text-center">
+                <th>Image</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Race</th>
+                <th>Birth</th>
+                <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% if pets %}
+              {% for pet in pets %}
+
+            <tr class="text-center align-middle">
+              <td><img src="{{ pet.image.url }}" alt="..." style="width: 150px"></td>
+              <td>{{ pet.name }}</td>
+              <td>{{ pet.type }}</td>
+              <td>{{ pet.race }}</td>
+              <td>{{ pet.dob }}</td>
+              <td>
+                  <form method="post" id="delete_form{{ pet.id }}">
+                      {% csrf_token %}
+                      <input type="hidden" name="delete_pet" value="{{ pet.id }}">
+                      <button type="button" onclick="confirmDelete({{ pet.id }})"  style="border: none; background-color: lavenderblush" ><i class="bi-trash" style="font-size: 2rem"></i></button>
+                  </form>
+              </td>
+            </tr>
+              {% endfor %}
+          {% endif %}
+            <script>
+                function confirmDelete(pet_id) {
+                    var result = confirm("Are you sure you want to delete?");
+                    if (result) {
+                        // User clicked OK, proceed with delete action
+                        document.getElementById('delete_form'+pet_id).submit();
+                        alert("Content deleted successfully!");
+                    } else {
+                        // User clicked Cancel, do nothing
+                        alert("Delete operation canceled.");
+                    }
+                }
+            </script>
+
+          </tbody>
+
+
+            <div>
+                <form method="post" enctype="multipart/form-data" class="">
+                    {% csrf_token %}
+                    <tr class="collapse multi-collapse text-center align-middle" id="collapse1">
+                    <td><input required accept="image/*" type="file" name="pet_image"></td>
+                    <td><input required type="text" name="pet_name" placeholder="Pet Name"></td>
+                    <td><input required type="text" name="pet_type" placeholder="Pet Type"></td>
+                    <td><input required type="text" name="pet_race" placeholder="Pet Race"></td>
+                    <td><input required type="date" name="pet_dob"></td>
+                    <td class="collapse multi-collapse text-center align-middle" id="collapse2"><button type="submit" name="form_two">Add</button></td>
+                    </tr>
+                    <tr class="">
+                        <td class="collapse multi-collapse" colspan="2"> <p class="d-inline-block">ChipSet:</p> <input id="chipset" type="checkbox" value="chipset" name="chipset"></td>
+                        <td class="collapse multi-collapse" colspan="4"> <p class="d-inline-block">Barren:</p> <input id="barren" type="checkbox" value="barren" name="barren"></td>
+                    </tr>
+
+
+                </form>
+            </div>
+        </table>
+      </div>
+          <button class="btn btn-primary d-block mx-auto mb-1" type="button" data-bs-toggle="collapse" data-bs-target=".multi-collapse">
+            <img class="img-thumbnail mx-auto d-block m-0 p-0 bg-dark" src="{% static 'assets/img/plus.png' %}" style="width: 50px" alt="..">
+          </button>
+
+
+      </div>
+    </section>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>

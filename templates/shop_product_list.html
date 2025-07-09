@@ -1,0 +1,237 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Shop</title>
+    <!-- Include Tailwind CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Retain Bootstrap Icons for iconography -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="bg-[#f5f6fa] py-4 border-b border-gray-300">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <div class="flex items-center">
+                <a href="/cart" class="relative mr-4">
+                    <i class="bi bi-cart3 text-2xl"></i>
+                    <span class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs px-1" id="cartCount">0</span>
+                </a>
+                <a href="/login" class="text-black no-underline mr-4" id="accountLink">Login</a>
+            </div>
+            <form class="flex flex-grow mx-4">
+                <input class="flex-grow p-2 border border-gray-300 rounded-l" type="search" placeholder="Search products..." id="searchInput">
+                <button class="px-4 py-2 bg-[#2ecc71] text-white rounded-r" type="submit">Search</button>
+            </form>
+            <a href="/shop/">
+                <img src="{% static '/assets/img/logo.png' %}" alt="Pet Shop" class="h-[50px]">
+            </a>
+        </div>
+    </nav>
+
+    <!-- Bottom Navbar -->
+    <nav class="bg-white shadow">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <div class="flex">
+                <a class="px-3 py-2" href="/contact">Contact</a>
+                <a class="px-3 py-2" href="/about">About</a>
+                <a class="px-3 py-2" href="/guide">Guide</a>
+                <a class="px-3 py-2" href="/blog">Blog</a>
+            </div>
+            <div class="relative group">
+                <a class="px-3 py-2" href="#">Categories</a>
+                <ul class="absolute left-0 mt-0 hidden group-hover:block bg-white shadow-lg w-48">
+                    <li class="relative group/sub">
+                        <a href="#" class="block px-4 py-2">Food</a>
+                        <ul class="absolute left-full top-0 hidden group-hover/sub:block bg-white shadow-lg w-56">
+                            <li><span class="block px-4 py-2 font-semibold text-[#27ae60]">Dry Food</span></li>
+                            <li><a class="block px-4 py-2" href="#">Puppy</a></li>
+                            <li><a class="block px-4 py-2" href="#">Adult</a></li>
+                            <li><span class="block px-4 py-2 font-semibold text-[#27ae60]">Wet Food</span></li>
+                            <li><a class="block px-4 py-2" href="#">Canned</a></li>
+                        </ul>
+                    </li>
+                    <li class="relative group/sub">
+                        <a href="#" class="block px-4 py-2">Toys</a>
+                        <ul class="absolute left-full top-0 hidden group-hover/sub:block bg-white shadow-lg w-56">
+                            <li><span class="block px-4 py-2 font-semibold text-[#27ae60]">Interactive</span></li>
+                            <li><a class="block px-4 py-2" href="#">Puzzles</a></li>
+                            <li><span class="block px-4 py-2 font-semibold text-[#27ae60]">Chew</span></li>
+                            <li><a class="block px-4 py-2" href="#">Bones</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto mt-4 px-4">
+        <div class="flex flex-wrap -mx-4">
+            <!-- Products Section -->
+            <div class="w-full md:w-9/12 px-4">
+                <div class="flex justify-between mb-4">
+                    <span id="productCount">Showing 1-4 of 50 products</span>
+                    <span>Category: All Products</span>
+                </div>
+                <div class="flex justify-between mb-4">
+                    <div>
+                        <button class="px-4 py-2 border border-[#2ecc71] text-[#2ecc71] rounded mr-2 layout-btn" id="detailedView">Detailed</button>
+                        <button class="px-4 py-2 bg-[#2ecc71] text-white rounded layout-btn active" id="gridView">Grid</button>
+                    </div>
+                    <select class="p-2 border border-gray-300 rounded w-auto" id="sortSelect">
+                        <option value="bestselling">Bestselling</option>
+                        <option value="score">Score</option>
+                        <option value="newest">Newest</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="price-low">Price: Low to High</option>
+                    </select>
+                </div>
+                <!-- Products Container -->
+                <div id="productsContainer" class="grid grid-cols-1 md:grid-cols-4 gap-4"></div>
+            </div>
+            <!-- Filters Section -->
+            <div class="w-full md:w-3/12 px-4 bg-[#f5f6fa] p-5">
+                <h5 class="mb-3">Filters</h5>
+                <div class="mb-4">
+                    <h6>Price Range</h6>
+                    <input type="range" class="w-full" min="0" max="100" value="100" id="priceRange">
+                    <small>$0 - $<span id="priceValue">100</span></small>
+                </div>
+                <div>
+                    <h6>Brand</h6>
+                    <div class="flex items-center mb-2">
+                        <input type="checkbox" class="mr-2" id="brand1" value="brand1">
+                        <label for="brand1">PawPerfect</label>
+                    </div>
+                    <div class="flex items-center mb-2">
+                        <input type="checkbox" class="mr-2" id="brand2" value="brand2">
+                        <label for="brand2">PetJoy</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Sample product data
+        const products = {{ data|safe }};
+
+        // Cart functionality
+        let cartCount = 0;
+        function updateCart(count) {
+            cartCount = count;
+            document.getElementById('cartCount').textContent = cartCount;
+        }
+
+        // Account status
+        const isLoggedIn = false;
+        document.getElementById('accountLink').textContent = isLoggedIn ? 'Profile' : 'Login';
+        document.getElementById('accountLink').href = isLoggedIn ? '/profile' : '/login';
+
+        // Product display
+        function renderProducts(productsToShow, detailed = false) {
+            const container = document.getElementById('productsContainer');
+            container.className = detailed ? 'space-y-4' : 'grid grid-cols-1 md:grid-cols-4 gap-4';
+            container.innerHTML = '';
+
+            productsToShow.forEach(product => {
+                const categoryPath = product.category.reverse().join(" < ");
+                const card = detailed ? `
+                    <div class="flex items-center p-4 bg-white shadow rounded transition duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg">
+                        <img src="${product.img}" class="w-40 h-40 object-cover mr-4" alt="${product.name}">
+                        <div>
+                            <h5 class="text-lg font-semibold">${product.name}</h5>
+                            <p class="text-sm text-gray-500">${categoryPath}</p>
+                            <p>${product.description}</p>
+                            <p><strong>Price:</strong> $${product.price} | <strong>Weight:</strong> ${product.weight}</p>
+                            <p><strong>In Stock:</strong> ${product.in_stock ? 'Yes' : 'No'} | <strong>Animal:</strong> ${product.animal}</p>
+                            <p><strong>Good For:</strong> ${product.good_for} | <strong>Brand:</strong> ${product.brand}</p>
+                            <button class="mt-2 px-4 py-2 bg-[#2ecc71] text-white rounded ${!product.in_stock ? 'opacity-50 cursor-not-allowed' : ''}" ${!product.in_stock ? 'disabled' : ''}>Add to Cart</button>
+                        </div>
+                    </div>
+                ` : `
+                    <div class="bg-white shadow rounded overflow-hidden transition duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg">
+                        <img src="${product.img}" class="w-full h-40 object-cover" alt="${product.name}">
+                        <div class="p-4">
+                            <h5 class="text-lg font-semibold">${product.name}</h5>
+                            <p class="text-gray-600">$${product.price}</p>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+            document.getElementById('productCount').textContent = `Showing 1-${productsToShow.length} of ${products.length} products`;
+        }
+
+        // Sorting function
+        function sortProducts(sortBy) {
+            let sortedProducts = [...products];
+            switch (sortBy) {
+                case 'bestselling':
+                    sortedProducts.sort((a, b) => b.sales - a.sales);
+                    break;
+                case 'score':
+                    sortedProducts.sort((a, b) => b.score - a.score);
+                    break;
+                case 'newest':
+                    sortedProducts.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+                    break;
+                case 'price-high':
+                    sortedProducts.sort((a, b) => b.price - a.price);
+                    break;
+                case 'price-low':
+                    sortedProducts.sort((a, b) => a.price - b.price);
+                    break;
+            }
+            return sortedProducts;
+        }
+
+        // Layout toggle
+        let currentView = 'grid';
+        document.getElementById('detailedView').addEventListener('click', () => {
+            currentView = 'detailed';
+            renderProducts(sortProducts(document.getElementById('sortSelect').value), true);
+            toggleActive('detailedView');
+        });
+
+        document.getElementById('gridView').addEventListener('click', () => {
+            currentView = 'grid';
+            renderProducts(sortProducts(document.getElementById('sortSelect').value), false);
+            toggleActive('gridView');
+        });
+
+        function toggleActive(activeId) {
+            document.querySelectorAll('.layout-btn').forEach(btn => {
+                if (btn.id === activeId) {
+                    btn.classList.add('bg-[#2ecc71]', 'text-white');
+                    btn.classList.remove('border-[#2ecc71]', 'text-[#2ecc71]');
+                } else {
+                    btn.classList.remove('bg-[#2ecc71]', 'text-white');
+                    btn.classList.add('border-[#2ecc71]', 'text-[#2ecc71]');
+                }
+            });
+        }
+
+        // Sort handler
+        document.getElementById('sortSelect').addEventListener('change', (e) => {
+            const sortedProducts = sortProducts(e.target.value);
+            renderProducts(sortedProducts, currentView === 'detailed');
+        });
+
+        // Price filter
+        const priceRange = document.getElementById('priceRange');
+        const priceValue = document.getElementById('priceValue');
+        priceRange.addEventListener('input', () => {
+            priceValue.textContent = priceRange.value;
+        });
+
+        // Initial render
+        renderProducts(products);
+        updateCart(0);
+    </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+{% load static %}
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="style.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'assets/css/pet_signup.css' %}">
+
+
+      <title>signup</title>
+</head>
+
+
+<body class="bg-primary bg-opacity-25">
+
+<div class="dropdown float-end p-3 m-3">
+  <button class="btn dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    EN
+  </button>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="#">فارسی</a></li>
+  </ul>
+</div>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+<div class="">
+  <img class="rounded-5 img-thumbnail img-fluid mx-auto d-block m-0 p-0 bg-dark" src="{% static 'assets/img/logo.png' %}" style="width:300px" alt="...">
+</div>
+
+<form method="post" class="text-center p-3 m-3">
+    {% csrf_token %}
+  <input required class="mb-1 bg-primary bg-opacity-75 text-light rounded-5 text-center" type="text" placeholder="Your Phone" name="mobile" style="width: 50%;height: 55px">
+    <br>
+  <input required class="mb-1 bg-primary bg-opacity-75 text-light rounded-5 text-center" type="password" placeholder="password" name="password" style="width: 50%;height: 55px">
+    <br>
+  <input required class="mb-1 bg-primary bg-opacity-75 text-light rounded-5 text-center" type="password" placeholder="retyped_password" name="retyped_password" style="width: 50%;height: 55px">
+    <br>
+  <button class="bg-primary bg-opacity-50 text-light fw-bold rounded-5" type="submit" style="width: 50%;height: 55px">Sign Up</button>
+</form>
+<p class="text-center">Have an account? <a href="/signin">SignIn</a></p>
+
+
+<div class="">
+  <img class="img-thumbnail rounded-5 mx-auto d-block" src="{% static 'assets/img/Fingerprint.png' %}" style="width:150px" alt="...">
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>

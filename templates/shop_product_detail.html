@@ -1,0 +1,567 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Shop Product Detail</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        /* Custom CSS Variables */
+        :root {
+            --primary-color: #2ecc71;
+            --secondary-color: #27ae60;
+            --light-bg: #f5f6fa;
+        }
+
+        /* Top Navbar Styles */
+        .navbar-top {
+            background-color: var(--light-bg);
+            padding: 0.25rem 1rem; /* Reduced padding for tighter stacking */
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        /* Bottom Navbar Styles */
+        .navbar-bottom {
+            background-color: white;
+            padding: 0.25rem 1rem; /* Reduced padding for tighter stacking */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Cart Icon Styles */
+        .cart-icon {
+            position: relative;
+        }
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 0.8rem;
+        }
+
+        /* Category Dropdown Styles */
+        .category-dropdown {
+            position: relative;
+        }
+        .category-dropdown .dropdown-menu {
+            min-width: 200px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            position: absolute;
+        }
+        .category-dropdown .dropdown-item {
+            position: relative;
+        }
+        .sub-dropdown {
+            min-width: 220px;
+            background-color: #fff;
+            border: none;
+            box-shadow: -4px 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            position: absolute;
+            left: -220px; /* Adjusted for seamless hover transition */
+            top: 0;
+        }
+        .sub-category {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            padding: 8px 15px;
+        }
+
+        /* Additional Styles for Product Detail Page */
+        html { scroll-behavior: smooth; }
+        .product-name { font-size: 2.5rem; color: var(--primary-color); margin-bottom: 1rem; }
+        .info-card { box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: none; transition: transform 0.2s; }
+        .info-card:hover { transform: translateY(-5px); }
+        .product-image { border: 1px solid #ddd; border-radius: 5px; max-width: 100%; }
+        .nav-tabs .nav-link { font-weight: bold; }
+        .nav-tabs .nav-link.active { color: var(--primary-color); border-bottom: 2px solid var(--primary-color); }
+    </style>
+
+    <!-- Stars Styling -->
+    <style>
+        #star-rating {
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            gap: 5px;
+        }
+
+        .star {
+            color: #ccc;
+            transition: color 0.3s;
+        }
+
+        .star:hover {
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navbar (Fixed) -->
+    <nav class="navbar navbar-top fixed-top">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <!-- Cart Icon with Badge -->
+                <a href="/cart" class="cart-icon me-4">
+                    <i class="bi bi-cart3 fs-4"></i>
+                    <span class="badge bg-danger rounded-pill cart-count" id="cartCount">0</span>
+                </a>
+                <!-- Login/Profile Link (Dynamic) -->
+                <a href="/login" class="text-decoration-none text-dark me-4" id="accountLink">Login</a>
+            </div>
+            <!-- Search Form -->
+            <form class="d-flex flex-grow-1 mx-4">
+                <input class="form-control me-2" type="search" placeholder="Search products..." id="searchInput">
+                <button class="btn btn-primary" type="submit" style="background-color: var(--primary-color); border: none;">Search</button>
+            </form>
+            <!-- Logo -->
+            <a href="/shop/">
+                <!-- Placeholder image; replace with {% static '/assets/img/logo.png' %} in Django -->
+                <img src="{% static '/assets/img/logo.png' %}" alt="Pet Shop" height="50">
+            </a>
+        </div>
+    </nav>
+
+    <!-- Bottom Navbar (Fixed Below Top Navbar) -->
+    <nav class="navbar navbar-expand navbar-bottom" style="position: fixed; width: 100%;">
+        <div class="container justify-content-between">
+            <!-- Navigation Links -->
+            <div class="d-flex">
+                <a class="nav-link px-3" href="/contact">Contact</a>
+                <a class="nav-link px-3" href="/about">About</a>
+                <a class="nav-link px-3" href="/guide">Guide</a>
+                <a class="nav-link px-3" href="/blog">Blog</a>
+            </div>
+            <!-- Category Dropdown -->
+            <div class="category-dropdown">
+                <a class="nav-link px-3" href="#" id="categoryToggle">Categories</a>
+                <ul class="dropdown-menu" id="categoryMenu">
+                    <li class="dropdown-item">
+                        <a href="#" class="base-category">Food</a>
+                        <ul class="sub-dropdown">
+                            <li><span class="sub-category">Dry Food</span></li>
+                            <li><a class="dropdown-item" href="#">Puppy</a></li>
+                            <li><a class="dropdown-item" href="#">Adult</a></li>
+                            <li><span class="sub-category">Wet Food</span></li>
+                            <li><a class="dropdown-item" href="#">Canned</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-item">
+                        <a href="#" class="base-category">Toys</a>
+                        <ul class="sub-dropdown">
+                            <li><span class="sub-category">Interactive</span></li>
+                            <li><a class="dropdown-item" href="#">Puzzles</a></li>
+                            <li><span class="sub-category">Chew</span></li>
+                            <li><a class="dropdown-item" href="#">Bones</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+<!-- Main Content -->
+<div class="container-fluid main-content pt-4 p-5">
+    <div class="row">
+        <!-- Left Column (Price and Actions) -->
+        <div class="col-md-3 p-2">
+            <div class="card border p-3">
+                <h4>Price: ${{ product_object.price }}</h4>
+                <p>In stock: {{ product_object.in_stock }}</p>
+
+                <!-- Cart Button -->
+                <div class="input-group mb-3 d-flex align-items-center">
+                    <form method="post" class="d-flex">
+                        {% csrf_token %}
+                        <input type="number" name="product_add_to_cart_count" max="{{ product_object.in_stock }}" class="form-control me-2" value="1" min="1" style="width: 120px;">
+                        <button class="btn btn-primary" type="submit" style="background-color: var(--primary-color); border: none;">Add to Cart</button>
+                    </form>
+                </div>
+                {% for message in messages %}
+                    <p class="text-danger">{{ message }}</p>
+                {% endfor %}
+
+
+                <!-- Scoring Section -->
+                <div class="score-section mb-0">
+                    <div class="d-flex align-items-center">
+                        <div id="score-display" class="text-warning fs-4">
+                            ⭐ {{ product_object.score_counter}}/5.0
+                        </div>
+                    </div>
+                    <p class="small text-muted">Based on {{ product_object.total_reviews }} reviews</p>
+                </div>
+
+                <!-- Rating Form -->
+                <form method="POST" class="mb-3">
+                    {% csrf_token %}
+                    <input type="hidden" name="rating" id="rating-input">
+                    <div class="d-flex align-items-center gap-2">
+                        <div id="star-rating">
+                            <span class="star" data-value="1">★</span>
+                            <span class="star" data-value="2">★</span>
+                            <span class="star" data-value="3">★</span>
+                            <span class="star" data-value="4">★</span>
+                            <span class="star" data-value="5">★</span>
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-primary" id="submit-rating" disabled>Submit</button>
+                    </div>
+                </form>
+
+
+                <a href="https://t.me/yourpetshop" class="btn btn-primary w-100">
+                    <i class="bi bi-telegram"></i> Need advice?
+                </a>
+            </div>
+        </div>
+
+
+
+
+
+
+            <!-- Middle Column (Product Info) -->
+            <div class="col-md-5 p-2">
+                <h2 class="product-name">{{ product_object.name }} </h2>
+                <p>Brand: {{ product_object.brand }} <i class="bi bi-dog"></i></p>
+                <p>Description: {{ product_object.description }}</p>
+                <div class="row">
+                    <div class="col_6">
+                        <p>Good for: {{ product_object.good_for }}</p>
+                    </div>
+                    <div class="col_6">
+                        <p>Weight: {{ product_object.weight }}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    {% for product_info in product_object.product_infos.all %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card info-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ product_info.key }}</h5>
+                                    <p class="card-text">{{ product_info.value }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <hr>
+                <div class="text-center">
+                    <a href="#details" class="btn btn-outline-primary">Show All Details</a>
+                </div>
+            </div>
+            <!-- Right Column (Images and Tabs) -->
+            <div class="col-md-4 p-2">
+
+                <div class="position-relative mb-3">
+                    <img id="mainImage" src="{{ product_object.images.first.image.url }}" class="img-fluid product-image" alt="Product Image">
+                    <div class="position-absolute bottom-0 bg-light end-0 p-2">
+
+                        <button type="button" class="btn " data-bs-toggle="modal" data-bs-target="#linkModal">
+                            <i class="bi bi-share pe-1 "></i>
+                        </button>
+
+                        <div class="modal fade" id="linkModal" tabindex="-1" aria-labelledby="linkModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="linkModalLabel">Copy Link</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <input type="text" class="form-control" id="copyText" value="{{ request.build_absolute_uri }}" readonly>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button class="btn btn-success" onclick="copyToClipboard()">Copy</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex mb-3">
+                    {% for image in product_object.images.all %}
+                        <img style="width: 50px; cursor:pointer;" src="{{ image.image.url }}"
+                             class="img-thumbnail me-2 thumbnail-image"
+                             alt="Thumbnail {{ forloop.counter }}"
+                             onclick="openModal({{ forloop.counter0 }})">
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+
+            <!-- Modal for showing images -->
+        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body text-center">
+                        <button type="button" class="btn-close position-absolute top-0 end-0 m-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <img id="modalImage" src="" class="img-fluid" alt="Modal Image">
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button class="btn btn-secondary" onclick="prevImage()">❮</button>
+                        <button class="btn btn-secondary" onclick="nextImage()">❯</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Why Choose Us Section -->
+        <div class="row mt-4">
+                <h4>Why Choose Us</h4>
+                <div class="col-md-4 mb-3">
+                    <div class="card info-card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-truck"></i></h5>
+                            <p class="card-text">Fast Delivery</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card info-card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-globe"></i></h5>
+                            <p class="card-text">To all places in the country</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card info-card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-check-circle"></i></h5>
+                            <p class="card-text">Original Product</p>
+                        </div>
+                    </div>
+                </div>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-clock"></i> Delivery in capital: 1 day</li>
+                    <li><i class="bi bi-clock"></i> Other cities: 2 days</li>
+                </ul>
+        </div>
+
+
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" href="#reviews">Reviews</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#details">Details</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#comments">Comments</a>
+            </li>
+        </ul>
+
+        <!-- Reviews Section -->
+        <div id="reviews" class="mt-5 p-2">
+            <h3>Admin Review</h3>
+            <p>This premium dog food is highly recommended for its natural ingredients and balanced nutrition. Our team has tested it with various breeds, and the results have been outstanding. Dogs love the taste, and pet owners report improvements in their pets' coat and energy levels.</p>
+            <p><a href="#" class="btn btn-outline-primary">Leave a review</a></p>
+        </div>
+
+        <!-- Details Section -->
+        <div id="details" class="mt-5 p-2">
+            <h3>Product Details</h3>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Weight</th>
+                    <td>5 kg</td>
+                </tr>
+                <tr>
+                    <th>Protein</th>
+                    <td>25%</td>
+                </tr>
+                <tr>
+                    <th>Fat</th>
+                    <td>15%</td>
+                </tr>
+                <tr>
+                    <th>Ingredients</th>
+                    <td>Chicken, brown rice, peas, etc.</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Add Comments Section -->
+        <h2>Leave a Comment</h2>
+        <form id="commentForm" method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="comment" class="form-label">Comment</label>
+                <textarea class="form-control" name="comment" id="comment" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        <hr>
+
+        <!-- Comments Section -->
+        <div id="comments" class="mt-5 p-2">
+            <h3>Customer Comments</h3>
+            {% for comment in product_object.comments.all %}
+                <div class="mb-3">
+                    <strong>{{ comment.user }}</strong> <span class="text-muted">{{ comment.time_elapsed }}</span>
+                    <p>{{ comment.comment }}</p>
+                </div>
+            {% endfor %}
+        </div>
+
+
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample product data (replace with Django context)
+        const products = [];
+
+        // Cart Functionality
+        let cartCount = 0;
+        function updateCart(count) {
+            cartCount = count;
+            document.getElementById('cartCount').textContent = cartCount;
+        }
+
+        // Account Status (Dynamic in Django)
+        const isLoggedIn = false;
+        document.getElementById('accountLink').textContent = isLoggedIn ? 'Profile' : 'Login';
+        document.getElementById('accountLink').href = isLoggedIn ? '/profile' : '/login';
+
+        // Category Dropdown Hover Effects
+        const categoryToggle = document.getElementById('categoryToggle');
+        const categoryMenu = document.getElementById('categoryMenu');
+        const baseCategories = document.querySelectorAll('.base-category');
+
+        categoryToggle.addEventListener('mouseenter', () => {
+            categoryMenu.style.display = 'block';
+        });
+        categoryToggle.addEventListener('mouseleave', () => {
+            setTimeout(() => {
+                if (!categoryMenu.matches(':hover')) {
+                    categoryMenu.style.display = 'none';
+                }
+            }, 300); // Increased to 300ms for better hover transition
+        });
+        categoryMenu.addEventListener('mouseenter', () => {
+            categoryMenu.style.display = 'block';
+        });
+        categoryMenu.addEventListener('mouseleave', () => {
+            categoryMenu.style.display = 'none';
+        });
+
+        baseCategories.forEach(base => {
+            const subMenu = base.nextElementSibling;
+            if (subMenu && subMenu.classList.contains('sub-dropdown')) {
+                base.addEventListener('mouseenter', () => {
+                    subMenu.style.display = 'block';
+                });
+                base.addEventListener('mouseleave', () => {
+                    setTimeout(() => {
+                        if (!subMenu.matches(':hover')) {
+                            subMenu.style.display = 'none';
+                        }
+                    }, 300); // Increased to 300ms for better hover transition
+                });
+                subMenu.addEventListener('mouseenter', () => {
+                    subMenu.style.display = 'block';
+                });
+                subMenu.addEventListener('mouseleave', () => {
+                    subMenu.style.display = 'none';
+                });
+            }
+        });
+
+        // Dynamic Navbar Positioning
+        document.addEventListener('DOMContentLoaded', function() {
+            const navbarTop = document.querySelector('.navbar-top');
+            const navbarBottom = document.querySelector('.navbar-bottom');
+            if (navbarTop && navbarBottom) {
+                const topHeight = navbarTop.offsetHeight;
+                navbarBottom.style.top = `${topHeight}px`;
+                const totalHeight = topHeight + navbarBottom.offsetHeight;
+                document.body.style.paddingTop = `${totalHeight}px`;
+            }
+        });
+    </script>
+
+
+<!-- JavaScript for Star Rating -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const stars = document.querySelectorAll("#star-rating .star");
+        let selectedRating = 0;
+        const submitButton = document.getElementById("submit-rating");
+        const ratingInput = document.getElementById("rating-input");
+
+        stars.forEach(star => {
+            star.addEventListener("mouseover", function () {
+                highlightStars(parseInt(this.getAttribute("data-value")));
+            });
+
+            star.addEventListener("click", function () {
+                selectedRating = parseInt(this.getAttribute("data-value"));
+                ratingInput.value = selectedRating;
+                submitButton.disabled = false;
+            });
+
+            star.addEventListener("mouseleave", function () {
+                highlightStars(selectedRating);
+            });
+        });
+
+        function highlightStars(value) {
+            stars.forEach(star => {
+                star.style.color = star.getAttribute("data-value") <= value ? "#ffc107" : "#ccc";
+            });
+        }
+    });
+</script>
+
+<!-- JavaScript for share botton -->
+    <script>
+        function copyToClipboard() {
+            let copyText = document.getElementById("copyText");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value);
+            alert("Copied to clipboard: " + copyText.value);
+        }
+    </script>
+
+
+<!-- JavaScript for showing images -->
+    <script>
+        let imageUrls = [{% for image in product_object.images.all %}'{{ image.image.url }}',{% endfor %}];
+        let currentIndex = 0;
+
+        function openModal(index) {
+            currentIndex = index;
+            document.getElementById("modalImage").src = imageUrls[currentIndex];
+            new bootstrap.Modal(document.getElementById("imageModal")).show();
+        }
+
+        function prevImage() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                document.getElementById("modalImage").src = imageUrls[currentIndex];
+            }
+        }
+
+        function nextImage() {
+            if (currentIndex < imageUrls.length - 1) {
+                currentIndex++;
+                document.getElementById("modalImage").src = imageUrls[currentIndex];
+            }
+        }
+    </script>
+
+
+</body>
+</html>

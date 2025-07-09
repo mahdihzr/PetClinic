@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Shop Admin - Edit Product</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            padding-top: 20px;
+            background-color: #212529; /* Matches previous dark sidebar */
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px; /* Matches previous padding */
+        }
+        .card {
+            margin-bottom: 20px; /* Matches previous mb-4 spacing */
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Menu -->
+    <div class="sidebar bg-dark text-white">
+        <h4 class="text-center py-3">Admin Panel</h4>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/shop/admin/category/">Category Manager</a>
+            </li>
+            <li class="nav-item">
+                <div class="dropdown">
+                    <a class="nav-link text-white dropdown-toggle active" href="#" data-bs-toggle="dropdown">
+                        Product Manager
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/shop/admin/manage_product/">Manage</a></li>
+                        <li><a class="dropdown-item" href="/shop/admin/create_product/">Create Product</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#">Comment Manager</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#">User Manager</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="card">
+            <div class="card-header">Create New Product</div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <!-- Product Name -->
+                    <div class="mb-3">
+                        <label for="productName" class="form-label">Product Name</label>
+                        <input type="text" name="product_name" value="{{ product_obj.name }}" class="form-control" id="productName" required>
+                    </div>
+
+                    <!-- Images -->
+                    <div class="mb-3">
+                        <label for="productImages" class="form-label">Product Images</label>
+                        <input type="file" class="form-control" id="productImages" multiple accept="image/*" disabled>
+                    </div>
+
+                    <!-- Category Selection -->
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <select class="form-select" name="category"  id="category" onchange="Subcategories()" required>
+                                    <option value="">Select Category</option>
+                                    {% if categories %}
+                                        {% for category in categories %}
+                                            <option {% if category == product_obj.category.parent.parent.name  %}
+                                            selected
+                                            {% endif %} >{{ category }}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" name="subcategory" id="subcategory" onchange="SubSubcategories()" required>
+                                    <option value="{{ product_obj.category.parent }}">{{ product_obj.category.parent }}</option>
+
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" name="sub_subcategory" id="subSubcategory" required>
+                                    <option value="{{ product_obj.category }}">{{ product_obj.category }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" name="description" id="description" rows="4" required>{{ product_obj.description }}</textarea>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Price ($)</label>
+                        <input type="number" name="price" value="{{ product_obj.price }}" class="form-control" id="price" step="0.01" min="0" required>
+                    </div>
+
+                    <!-- Weight -->
+                    <div class="mb-3">
+                        <label for="weight" class="form-label">Weight (kg)</label>
+                        <input type="number" name="weight" value="{{ product_obj.weight }}" class="form-control" id="weight" step="0.1" min="0" required>
+                    </div>
+
+                    <!-- In Stock -->
+                    <div class="mb-3">
+                        <label for="inStock" class="form-label">In Stock (quantity)</label>
+                        <input type="number" name="in_stock" value="{{ product_obj.in_stock }}" class="form-control" id="inStock" min="0" step="1" required>
+                    </div>
+
+                    <!-- Animal Kind -->
+                    <div class="mb-3">
+                        <label for="animalKind" class="form-label">Animal Kind</label>
+                        <input type="text" name="animal_kind" value="{{ product_obj.animal }}" class="form-control" id="animalKind" required>
+                    </div>
+
+                    <!-- Good For -->
+                    <div class="mb-3">
+                        <label for="goodFor" class="form-label">Good For</label>
+                        <input type="text" name="good_for" value="{{ product_obj.good_for }}" class="form-control" id="goodFor" required>
+                    </div>
+
+                    <!-- Brand -->
+                    <div class="mb-3">
+                        <label for="brand" class="form-label">Brand</label>
+                        <input type="text" name="brand" value="{{ product_obj.brand }}" class="form-control" id="brand" required>
+                    </div>
+
+                    <!-- Info -->
+                    {% for info in product_obj.product_infos.all %}
+                        <input type="text" name="keys[]" value="{{ info.key }}" class="form-control" placeholder="Key" required>
+                        <input type="text" name="values[]" value="{{ info.value }}" class="form-control" placeholder="Value" required>
+                        <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">x</button>
+                    {% endfor %}
+
+                    <div id="keyValueContainer"></div>
+                    <button type="button" class="btn btn-primary mt-2 mb-3" onclick="addKeyValuePair()">+
+                    </button>
+                    <br>
+
+                    <button type="submit" class="btn btn-primary">Edit Product</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Custom Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const categories = {{ categories|safe }};
+
+
+        function Subcategories() {
+                const baseCategory = document.getElementById('category').value;
+                const subCategory = document.getElementById('subcategory');
+
+                subCategory.innerHTML = '<option value="">Select Subcategory</option>';
+
+                if (categories && categories[baseCategory]) {
+                    Object.keys(categories[baseCategory]).forEach(subcat => {
+                        subCategory.innerHTML += `<option>${subcat}</option>`;
+                    });
+                }
+                }
+
+
+                // New function for sub-subcategory selection
+        function SubSubcategories() {
+            const baseCategory = document.getElementById('category').value;
+            const subCategory = document.getElementById('subcategory').value;
+            const subSubCategory = document.getElementById('subSubcategory');
+
+            subSubCategory.innerHTML = '<option value="">Select Sub-subcategory</option>';
+
+
+            if (categories && categories[baseCategory] && categories[baseCategory][subCategory]) {
+                categories[baseCategory][subCategory].forEach(subSubCat => {
+                    subSubCategory.innerHTML += `<option value="${subSubCat}">${subSubCat}</option>`;
+                });
+            }
+        }
+    </script>
+
+
+    <!-- script for adding info -->
+    <script>
+        function addKeyValuePair() {
+            let container = document.getElementById("keyValueContainer");
+            let div = document.createElement("div");
+            div.classList.add("input-group", "mb-2");
+            div.innerHTML = `
+                <input type="text" name="keys[]" class="form-control" placeholder="Key" required>
+                <input type="text" name="values[]" class="form-control" placeholder="Value" required>
+                <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">x</button>
+            `;
+            container.appendChild(div);
+        }
+    </script>
+</body>
+</html>

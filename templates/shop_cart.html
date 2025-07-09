@@ -1,0 +1,328 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Shop Product Detail</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+    <style>
+        /* Custom CSS Variables */
+        :root {
+            --primary-color: #2ecc71;
+            --secondary-color: #27ae60;
+            --light-bg: #f5f6fa;
+        }
+
+        /* Top Navbar Styles */
+        .navbar-top {
+            background-color: var(--light-bg);
+            padding: 0.25rem 1rem; /* Reduced padding for tighter stacking */
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        /* Bottom Navbar Styles */
+        .navbar-bottom {
+            background-color: white;
+            padding: 0.25rem 1rem; /* Reduced padding for tighter stacking */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Cart Icon Styles */
+        .cart-icon {
+            position: relative;
+        }
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 0.8rem;
+        }
+
+        /* Category Dropdown Styles */
+        .category-dropdown {
+            position: relative;
+        }
+        .category-dropdown .dropdown-menu {
+            min-width: 200px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            position: absolute;
+        }
+        .category-dropdown .dropdown-item {
+            position: relative;
+        }
+        .sub-dropdown {
+            min-width: 220px;
+            background-color: #fff;
+            border: none;
+            box-shadow: -4px 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            position: absolute;
+            left: -220px; /* Adjusted for seamless hover transition */
+            top: 0;
+        }
+        .sub-category {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            padding: 8px 15px;
+        }
+
+        /* Additional Styles for Product Detail Page */
+        html { scroll-behavior: smooth; }
+        .nav-tabs .nav-link { font-weight: bold; }
+        .nav-tabs .nav-link.active { color: var(--primary-color); border-bottom: 2px solid var(--primary-color); }
+    </style>
+
+
+</head>
+<body>
+    <!-- Top Navbar (Fixed) -->
+    <nav class="navbar navbar-top fixed-top">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <!-- Cart Icon with Badge -->
+                <a href="/cart" class="cart-icon me-4">
+                    <i class="bi bi-cart3 fs-4"></i>
+                    <span class="badge bg-danger rounded-pill cart-count" id="cartCount">0</span>
+                </a>
+                <!-- Login/Profile Link (Dynamic) -->
+                <a href="/login" class="text-decoration-none text-dark me-4" id="accountLink">Login</a>
+            </div>
+            <!-- Search Form -->
+            <form class="d-flex flex-grow-1 mx-4">
+                <input class="form-control me-2" type="search" placeholder="Search products..." id="searchInput">
+                <button class="btn btn-primary" type="submit" style="background-color: var(--primary-color); border: none;">Search</button>
+            </form>
+            <!-- Logo -->
+            <a href="/shop/">
+                <!-- Placeholder image; replace with {% static '/assets/img/logo.png' %} in Django -->
+                <img src="{% static '/assets/img/logo.png' %}" alt="Pet Shop" height="50">
+            </a>
+        </div>
+    </nav>
+
+    <!-- Bottom Navbar (Fixed Below Top Navbar) -->
+    <nav class="navbar navbar-expand navbar-bottom" style="position: fixed; width: 100%;">
+        <div class="container justify-content-between">
+            <!-- Navigation Links -->
+            <div class="d-flex">
+                <a class="nav-link px-3" href="/contact">Contact</a>
+                <a class="nav-link px-3" href="/about">About</a>
+                <a class="nav-link px-3" href="/guide">Guide</a>
+                <a class="nav-link px-3" href="/blog">Blog</a>
+            </div>
+            <!-- Category Dropdown -->
+            <div class="category-dropdown">
+                <a class="nav-link px-3" href="#" id="categoryToggle">Categories</a>
+                <ul class="dropdown-menu" id="categoryMenu">
+                    <li class="dropdown-item">
+                        <a href="#" class="base-category">Food</a>
+                        <ul class="sub-dropdown">
+                            <li><span class="sub-category">Dry Food</span></li>
+                            <li><a class="dropdown-item" href="#">Puppy</a></li>
+                            <li><a class="dropdown-item" href="#">Adult</a></li>
+                            <li><span class="sub-category">Wet Food</span></li>
+                            <li><a class="dropdown-item" href="#">Canned</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-item">
+                        <a href="#" class="base-category">Toys</a>
+                        <ul class="sub-dropdown">
+                            <li><span class="sub-category">Interactive</span></li>
+                            <li><a class="dropdown-item" href="#">Puzzles</a></li>
+                            <li><span class="sub-category">Chew</span></li>
+                            <li><a class="dropdown-item" href="#">Bones</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+
+<div class="card" style="margin: auto; max-width: 950px; width: 90%; box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.19); border-radius: 1rem; border: transparent;">
+    <div class="row">
+        <div class="col-md-8 cart" style="background-color: #fff; padding: 4vh 5vh; border-bottom-left-radius: 1rem; border-top-left-radius: 1rem;">
+            <div class="title" style="margin-bottom: 5vh;">
+                <div class="row">
+                    <div class="col"><h4><b>Shopping Cart</b></h4></div>
+                    <div class="col align-self-center text-right text-muted">3 items</div>
+                </div>
+                {% for message in messages %}
+                    <h3 class="text-danger">{{ message }}</h3>
+                {% endfor %}
+            </div>
+
+            <form method="post" id="top-form">
+            {% csrf_token %}
+                {% for item in cart_items %}
+                    <div class="row border-top border-bottom">
+                        <div class="row main align-items-center" style="margin: 0; padding: 2vh 0; width: 100%;">
+                            <div class="col-2"><img alt="no image" class="img-fluid" src="{{ item.product.get_gallery.first.image.url }}" style="width: 3.5rem;"></div>
+                            <div class="col">
+                                <div class="row text-muted">{{  item.product.category.name }}</div>
+                                <div class="row">{{ item.product.name }}</div>
+                            </div>
+                            <div class="col">
+                                <input type="number" name="p{{ item.product.id }}" max="{{ item.product.in_stock }}" value="{{ item.quantity }}">
+                            </div>
+                            <div class="col">&dollar; {{ item.product.price }} <span class="close" style="margin-left: auto; font-size: 0.7rem;">&#10005;</span></div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </form>
+
+            <div class="back-to-shop" style="margin-top: 4.5rem;"><a href="#">&leftarrow;</a><span class="text-muted">Back to shop</span></div>
+        </div>
+        <div class="col-md-4 summary" style="background-color: #ddd; border-top-right-radius: 1rem; border-bottom-right-radius: 1rem; padding: 4vh; color: rgb(65, 65, 65);">
+            <div><h5 style="margin-top: 4vh;"><b>Summary</b></h5></div>
+            <hr style="margin-top: 1.25rem;">
+            <div class="row">
+                <div class="col" style="padding-left:0;">ITEMS 3</div>
+                <div class="col text-right">&euro; 132.00</div>
+            </div>
+            <form id="bottom-form" method="post" style="padding: 2vh 0;">
+                <p>SHIPPING</p>
+                <select style="border: 1px solid rgba(0, 0, 0, 0.137); padding: 1.5vh 1vh; margin-bottom: 4vh; outline: none; width: 100%; background-color: rgb(247, 247, 247);">
+                    <option class="text-muted">Standard-Delivery- &euro;5.00</option>
+                </select>
+                <p>GIVE CODE</p>
+                <input id="code" placeholder="Enter your code" style="border: 1px solid rgba(0, 0, 0, 0.137); padding: 1vh; margin-bottom: 4vh; outline: none; width: 100%; background-color: rgb(247, 247, 247); background-image: linear-gradient(to left, rgba(255, 255, 255, 0.253) , rgba(255, 255, 255, 0.185)), url('https://img.icons8.com/small/16/000000/long-arrow-right.png'); background-repeat: no-repeat; background-position-x: 95%; background-position-y: center;">
+            </form>
+            <div class="row" style="border-top: 1px solid rgba(0,0,0,.1); padding: 2vh 0;">
+                <div class="col">TOTAL PRICE</div>
+                <div class="col text-right">&euro; 137.00</div>
+            </div>
+            <button type="submit" onclick="submitForms()" class="btn" style="background-color: #000; border-color: #000; color: white; width: 100%; font-size: 0.7rem; margin-top: 4vh; padding: 1vh; border-radius: 0;">CHECKOUT</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample product data (replace with Django context)
+        const products = [];
+
+        // Cart Functionality
+        let cartCount = 0;
+        function updateCart(count) {
+            cartCount = count;
+            document.getElementById('cartCount').textContent = cartCount;
+        }
+
+        // Account Status (Dynamic in Django)
+        const isLoggedIn = false;
+        document.getElementById('accountLink').textContent = isLoggedIn ? 'Profile' : 'Login';
+        document.getElementById('accountLink').href = isLoggedIn ? '/profile' : '/login';
+
+        // Category Dropdown Hover Effects
+        const categoryToggle = document.getElementById('categoryToggle');
+        const categoryMenu = document.getElementById('categoryMenu');
+        const baseCategories = document.querySelectorAll('.base-category');
+
+        categoryToggle.addEventListener('mouseenter', () => {
+            categoryMenu.style.display = 'block';
+        });
+        categoryToggle.addEventListener('mouseleave', () => {
+            setTimeout(() => {
+                if (!categoryMenu.matches(':hover')) {
+                    categoryMenu.style.display = 'none';
+                }
+            }, 300); // Increased to 300ms for better hover transition
+        });
+        categoryMenu.addEventListener('mouseenter', () => {
+            categoryMenu.style.display = 'block';
+        });
+        categoryMenu.addEventListener('mouseleave', () => {
+            categoryMenu.style.display = 'none';
+        });
+
+        baseCategories.forEach(base => {
+            const subMenu = base.nextElementSibling;
+            if (subMenu && subMenu.classList.contains('sub-dropdown')) {
+                base.addEventListener('mouseenter', () => {
+                    subMenu.style.display = 'block';
+                });
+                base.addEventListener('mouseleave', () => {
+                    setTimeout(() => {
+                        if (!subMenu.matches(':hover')) {
+                            subMenu.style.display = 'none';
+                        }
+                    }, 300); // Increased to 300ms for better hover transition
+                });
+                subMenu.addEventListener('mouseenter', () => {
+                    subMenu.style.display = 'block';
+                });
+                subMenu.addEventListener('mouseleave', () => {
+                    subMenu.style.display = 'none';
+                });
+            }
+        });
+
+        // Dynamic Navbar Positioning
+        document.addEventListener('DOMContentLoaded', function() {
+            const navbarTop = document.querySelector('.navbar-top');
+            const navbarBottom = document.querySelector('.navbar-bottom');
+            if (navbarTop && navbarBottom) {
+                const topHeight = navbarTop.offsetHeight;
+                navbarBottom.style.top = `${topHeight}px`;
+                const totalHeight = topHeight + navbarBottom.offsetHeight;
+                document.body.style.paddingTop = `${totalHeight}px`;
+            }
+        });
+    </script>
+
+<!-- javascript to handle one botton for tow forms -->
+<script>
+    function submitForms() {
+        const topFormEl = document.getElementById("top-form");
+        const inputs = topFormEl.querySelectorAll("input[type='number']");
+
+        for (let input of inputs) {
+            const max = parseInt(input.max, 10);
+            const val = parseInt(input.value, 10);
+
+            if (val > max) {
+                alert(`"${input.name}" exceeds the allowed max of ${max}`);
+                return;
+            }
+        }
+
+        let formData = new FormData(topFormEl);
+        const bottomFormData = new FormData(document.getElementById("bottom-form"));
+        for (let [key, value] of bottomFormData.entries()) {
+            formData.append(key, value);
+        }
+
+        fetch('/shop/cart', {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                return response.text();
+            }
+        }).then(data => {
+            console.log("Response:", data);
+        }).catch(error => console.error("Error:", error));
+    }
+</script>
+
+
+</body>
+</html>

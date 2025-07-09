@@ -1,0 +1,380 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Shop Product Detail</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+    <style>
+        /* Custom CSS Variables */
+        :root {
+            --primary-color: #2ecc71;
+            --secondary-color: #27ae60;
+            --light-bg: #f5f6fa;
+        }
+
+        /* Top Navbar Styles */
+        .navbar-top {
+            background-color: var(--light-bg);
+            padding: 0.25rem 1rem; /* Reduced padding for tighter stacking */
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        /* Bottom Navbar Styles */
+        .navbar-bottom {
+            background-color: white;
+            padding: 0.25rem 1rem; /* Reduced padding for tighter stacking */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Cart Icon Styles */
+        .cart-icon {
+            position: relative;
+        }
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 0.8rem;
+        }
+
+        /* Category Dropdown Styles */
+        .category-dropdown {
+            position: relative;
+        }
+        .category-dropdown .dropdown-menu {
+            min-width: 200px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            position: absolute;
+        }
+        .category-dropdown .dropdown-item {
+            position: relative;
+        }
+        .sub-dropdown {
+            min-width: 220px;
+            background-color: #fff;
+            border: none;
+            box-shadow: -4px 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            position: absolute;
+            left: -220px; /* Adjusted for seamless hover transition */
+            top: 0;
+        }
+        .sub-category {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            padding: 8px 15px;
+        }
+
+        /* Additional Styles for Product Detail Page */
+        html { scroll-behavior: smooth; }
+        .nav-tabs .nav-link { font-weight: bold; }
+        .nav-tabs .nav-link.active { color: var(--primary-color); border-bottom: 2px solid var(--primary-color); }
+    </style>
+
+
+</head>
+<body>
+    <!-- Top Navbar (Fixed) -->
+    <nav class="navbar navbar-top fixed-top">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <!-- Cart Icon with Badge -->
+                <a href="/cart" class="cart-icon me-4">
+                    <i class="bi bi-cart3 fs-4"></i>
+                    <span class="badge bg-danger rounded-pill cart-count" id="cartCount">0</span>
+                </a>
+                <!-- Login/Profile Link (Dynamic) -->
+                <a href="/login" class="text-decoration-none text-dark me-4" id="accountLink">Login</a>
+            </div>
+            <!-- Search Form -->
+            <form class="d-flex flex-grow-1 mx-4">
+                <input class="form-control me-2" type="search" placeholder="Search products..." id="searchInput">
+                <button class="btn btn-primary" type="submit" style="background-color: var(--primary-color); border: none;">Search</button>
+            </form>
+            <!-- Logo -->
+            <a href="/shop/">
+                <!-- Placeholder image; replace with {% static '/assets/img/logo.png' %} in Django -->
+                <img src="{% static '/assets/img/logo.png' %}" alt="Pet Shop" height="50">
+            </a>
+        </div>
+    </nav>
+
+    <!-- Bottom Navbar (Fixed Below Top Navbar) -->
+    <nav class="navbar navbar-expand navbar-bottom" style="position: fixed; width: 100%;">
+        <div class="container justify-content-between">
+            <!-- Navigation Links -->
+            <div class="d-flex">
+                <a class="nav-link px-3" href="/contact">Contact</a>
+                <a class="nav-link px-3" href="/about">About</a>
+                <a class="nav-link px-3" href="/guide">Guide</a>
+                <a class="nav-link px-3" href="/blog">Blog</a>
+            </div>
+            <!-- Category Dropdown -->
+            <div class="category-dropdown">
+                <a class="nav-link px-3" href="#" id="categoryToggle">Categories</a>
+                <ul class="dropdown-menu" id="categoryMenu">
+                    <li class="dropdown-item">
+                        <a href="#" class="base-category">Food</a>
+                        <ul class="sub-dropdown">
+                            <li><span class="sub-category">Dry Food</span></li>
+                            <li><a class="dropdown-item" href="#">Puppy</a></li>
+                            <li><a class="dropdown-item" href="#">Adult</a></li>
+                            <li><span class="sub-category">Wet Food</span></li>
+                            <li><a class="dropdown-item" href="#">Canned</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-item">
+                        <a href="#" class="base-category">Toys</a>
+                        <ul class="sub-dropdown">
+                            <li><span class="sub-category">Interactive</span></li>
+                            <li><a class="dropdown-item" href="#">Puzzles</a></li>
+                            <li><span class="sub-category">Chew</span></li>
+                            <li><a class="dropdown-item" href="#">Bones</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="container mt-5">
+    <h2 class="mb-4">Order Summary</h2>
+
+    <form method="post" >
+        {% csrf_token %}
+        <div class="table-responsive">
+            <table class="table table-bordered text-center align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Image</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price (each)</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for item in cart_items %}
+                    <tr>
+                        <td><img style="width: 100px; height: 100px" src="{{ item.product.images.first.image.url }}"></td>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ item.product.price }}</td>
+                        <td>${{ item.get_total_price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="table-secondary">
+                    <tr>
+                        <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                        <td><strong>${{ total_price }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <hr class="my-4">
+
+        <h4 class="mb-3">Delivery Information</h4>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="fullName" class="form-label">Full Name</label>
+            <input name="full_name" type="text" placeholder="Peter Parker" class="form-control" required>
+          </div>
+
+          <div class="col-md-6">
+            <label for="phone" class="form-label">Phone Number</label>
+            <p class="" name="phone" >{{ request.user }}</p>
+          </div>
+
+          <div class="col-12">
+            <label for="address_select" class="form-label">Delivery Address</label>
+            <select name="address_select" id="address_select" class="form-select">
+              {% for address in addresses %}
+              <option value="{{ address.id }}">{{ address.value }}</option>
+              {% endfor %}
+            </select>
+
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="checkbox" id="newAddressToggle">
+              <label class="form-check-label" for="newAddressToggle">Enter new address</label>
+            </div>
+
+            <input name="new_address" id="new_address" type="text" class="form-control mt-2" placeholder="New Address Here..." style="display: none;">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Delivery Date</label>
+            <div class="form-control-plaintext">{{ delivery_date }}</div>
+              <p id="persian-date"></p>
+            <input type="hidden" name="delivery_date" value="{{ delivery_date }}">
+          </div>
+        </div>
+
+        <div class="mt-4 text-end">
+          <button class="btn btn-success btn-lg px-4" type="submit">Confirm & Pay</button>
+        </div>
+    </form>
+
+    <div class="alert alert-warning mt-5">
+        <strong>Note:</strong> Please double check your order before confirming. Once confirmed, your stock is reserved and will proceed to payment. Do not reload during payment to avoid duplicate charges.
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample product data (replace with Django context)
+        const products = [];
+
+        // Cart Functionality
+        let cartCount = 0;
+        function updateCart(count) {
+            cartCount = count;
+            document.getElementById('cartCount').textContent = cartCount;
+        }
+
+        // Account Status (Dynamic in Django)
+        const isLoggedIn = false;
+        document.getElementById('accountLink').textContent = isLoggedIn ? 'Profile' : 'Login';
+        document.getElementById('accountLink').href = isLoggedIn ? '/profile' : '/login';
+
+        // Category Dropdown Hover Effects
+        const categoryToggle = document.getElementById('categoryToggle');
+        const categoryMenu = document.getElementById('categoryMenu');
+        const baseCategories = document.querySelectorAll('.base-category');
+
+        categoryToggle.addEventListener('mouseenter', () => {
+            categoryMenu.style.display = 'block';
+        });
+        categoryToggle.addEventListener('mouseleave', () => {
+            setTimeout(() => {
+                if (!categoryMenu.matches(':hover')) {
+                    categoryMenu.style.display = 'none';
+                }
+            }, 300); // Increased to 300ms for better hover transition
+        });
+        categoryMenu.addEventListener('mouseenter', () => {
+            categoryMenu.style.display = 'block';
+        });
+        categoryMenu.addEventListener('mouseleave', () => {
+            categoryMenu.style.display = 'none';
+        });
+
+        baseCategories.forEach(base => {
+            const subMenu = base.nextElementSibling;
+            if (subMenu && subMenu.classList.contains('sub-dropdown')) {
+                base.addEventListener('mouseenter', () => {
+                    subMenu.style.display = 'block';
+                });
+                base.addEventListener('mouseleave', () => {
+                    setTimeout(() => {
+                        if (!subMenu.matches(':hover')) {
+                            subMenu.style.display = 'none';
+                        }
+                    }, 300); // Increased to 300ms for better hover transition
+                });
+                subMenu.addEventListener('mouseenter', () => {
+                    subMenu.style.display = 'block';
+                });
+                subMenu.addEventListener('mouseleave', () => {
+                    subMenu.style.display = 'none';
+                });
+            }
+        });
+
+        // Dynamic Navbar Positioning
+        document.addEventListener('DOMContentLoaded', function() {
+            const navbarTop = document.querySelector('.navbar-top');
+            const navbarBottom = document.querySelector('.navbar-bottom');
+            if (navbarTop && navbarBottom) {
+                const topHeight = navbarTop.offsetHeight;
+                navbarBottom.style.top = `${topHeight}px`;
+                const totalHeight = topHeight + navbarBottom.offsetHeight;
+                document.body.style.paddingTop = `${totalHeight}px`;
+            }
+        });
+    </script>
+
+
+
+<!-- javascript for new address -->
+<script>
+  const toggle = document.getElementById('newAddressToggle');
+  const newAddressInput = document.getElementById('new_address');
+  const addressSelect = document.getElementById('address_select');
+
+  toggle.addEventListener('change', function () {
+    if (this.checked) {
+      newAddressInput.style.display = 'block';
+      addressSelect.disabled = true;
+      addressSelect.name = '';
+      newAddressInput.name = 'address';
+    } else {
+      newAddressInput.style.display = 'none';
+      addressSelect.disabled = false;
+      newAddressInput.name = '';
+      addressSelect.name = 'address';
+    }
+  });
+</script>
+
+
+<!-- javascript for date of delivery -->
+<script>
+  function getPersianDateTwoDaysLater() {
+    const today = new Date();
+    const twoDaysLater = new Date(today.setDate(today.getDate() + 2));
+
+    const formatter = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    return formatter.format(twoDaysLater); // Example: ۱۸ فروردین ۱۴۰۴
+  }
+
+  console.log(getPersianDateTwoDaysLater());
+    document.getElementById('persian-date').textContent = getPersianDateTwoDaysLater();
+
+</script>
+
+</body>
+</html>

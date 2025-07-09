@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delete Confirmation</title>
+<script>
+    function confirmDelete() {
+        var result = confirm("Are you sure you want to delete?");
+        if (result) {
+            // User clicked OK, proceed with delete action
+            // Here you can add JavaScript code to perform the delete action
+            alert("Content deleted successfully!");
+        } else {
+            // User clicked Cancel, do nothing
+            alert("Delete operation canceled.");
+        }
+    }
+</script>
+</head>
+<body>
+
+<!-- Button to trigger delete confirmation -->
+<button onclick="confirmDelete()">Delete Content</button>
+
+</body>
+</html>

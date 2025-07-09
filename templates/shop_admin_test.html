@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Voting System</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <style>
+        /* Custom styles defined below */
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="product-voting">
+            <h3 class="mb-3">Product Name</h3>
+
+            <!-- Score Display Section -->
+            <div class="score-display mb-4">
+                <div class="stars-container" style="position: relative; display: inline-block;">
+                    <div class="stars-empty">
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <div class="stars-filled" style="position: absolute; top: 0; left: 0; width: 84%; overflow: hidden; white-space: nowrap;">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <span class="score-text ml-2">4.2 out of 5</span>
+            </div>
+
+            <!-- Voting Section -->
+            <div class="vote-section">
+                <p class="mb-2">Rate this product:</p>
+                <div class="voting-stars">
+                    <i class="far fa-star" data-value="1"></i>
+                    <i class="far fa-star" data-value="2"></i>
+                    <i class="far fa-star" data-value="3"></i>
+                    <i class="far fa-star" data-value="4"></i>
+                    <i class="far fa-star" data-value="5"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script>
+                // Store the selected rating (null initially)
+        let selectedValue = null;
+
+        // Select all voting stars
+        const votingStars = document.querySelectorAll('.voting-stars i');
+
+        // Function to highlight stars up to a certain value
+        function highlightStars(upTo) {
+            votingStars.forEach(star => {
+                const value = parseInt(star.getAttribute('data-value'));
+                if (value <= upTo) {
+                    star.classList.remove('far');
+                    star.classList.add('fas');
+                } else {
+                    star.classList.remove('fas');
+                    star.classList.add('far');
+                }
+            });
+        }
+
+        // Add event listeners to each star
+        votingStars.forEach(star => {
+            // On hover, highlight stars up to the hovered one
+            star.addEventListener('mouseover', () => {
+                const value = parseInt(star.getAttribute('data-value'));
+                highlightStars(value);
+            });
+
+
+            // On click, set the selected value and highlight accordingly
+            star.addEventListener('click', () => {
+                selectedValue = parseInt(star.getAttribute('data-value'));
+                highlightStars(selectedValue);
+                // Optionally, send the vote to the server here (e.g., via AJAX)
+                console.log(`Rated: ${selectedValue} stars`); // Placeholder for server submission
+            });
+        });
+    </script>
+</body>
+</html>

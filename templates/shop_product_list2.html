@@ -1,0 +1,400 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Shop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2ecc71;
+            --secondary-color: #27ae60;
+            --light-bg: #f5f6fa;
+        }
+
+        .navbar-top {
+            background-color: var(--light-bg);
+            padding: 15px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .navbar-bottom {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .cart-icon {
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 0.8rem;
+        }
+
+        .category-dropdown {
+            position: relative;
+        }
+
+        .category-dropdown .dropdown-menu {
+            min-width: 200px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            position: absolute;
+        }
+
+        .category-dropdown .dropdown-item {
+            position: relative;
+        }
+
+        .sub-dropdown {
+            min-width: 220px;
+            background-color: #fff;
+            border: none;
+            box-shadow: -4px 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            position: absolute;
+            left: -220px;
+            top: 0;
+        }
+
+        .sub-category {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            padding: 8px 15px;
+        }
+
+        .filters-section {
+            background-color: var(--light-bg);
+            padding: 20px;
+            height: 100%;
+        }
+
+        .product-card {
+            transition: transform 0.2s;
+            border: none;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .layout-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .detailed-view .product-card {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .product-img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+
+        .grid-view .product-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .detailed-view .product-details {
+            flex-grow: 1;
+        }
+
+        .category-path {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navbar (unchanged) -->
+    <nav class="navbar navbar-top">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <a href="/cart" class="cart-icon me-4">
+                    <i class="bi bi-cart3 fs-4"></i>
+                    <span class="badge bg-danger rounded-pill cart-count" id="cartCount">0</span>
+                </a>
+                <a href="/login" class="text-decoration-none text-dark me-4" id="accountLink">Login</a>
+            </div>
+            <form class="d-flex flex-grow-1 mx-4">
+                <input class="form-control me-2" type="search" placeholder="Search products..." id="searchInput">
+                <button class="btn btn-primary" type="submit" style="background-color: var(--primary-color); border: none;">Search</button>
+            </form>
+            <a href="/shop/">
+                <img src="{% static '/assets/img/logo.png' %}" alt="Pet Shop" height="50">
+            </a>
+        </div>
+    </nav>
+
+    <!-- Bottom Navbar -->
+    <nav class="navbar navbar-expand navbar-bottom">
+        <div class="container justify-content-between">
+            <div class="d-flex">
+                <a class="nav-link px-3" href="/contact">Contact</a>
+                <a class="nav-link px-3" href="/about">About</a>
+                <a class="nav-link px-3" href="/guide">Guide</a>
+                <a class="nav-link px-3" href="/blog">Blog</a>
+            </div>
+            <div class="category-dropdown">
+                <a class="nav-link px-3" href="#" id="categoryToggle">Categories</a>
+                <ul class="dropdown-menu" id="categoryMenu">
+                    <li class="dropdown-item">
+                        <a href="#" class="base-category">Food</a>
+                        <ul class="sub-dropdown">
+                            <li><span class="sub-category">Dry Food</span></li>
+                            <li><a class="dropdown-item" href="#">Puppy</a></li>
+                            <li><a class="dropdown-item" href="#">Adult</a></li>
+                            <li><span class="sub-category">Wet Food</span></li>
+                            <li><a class="dropdown-item" href="#">Canned</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-item">
+                        <a href="#" class="base-category">Toys</a>
+                        <ul class="sub-dropdown">
+                            <li><span class="sub-category">Interactive</span></li>
+                            <li><a class="dropdown-item" href="#">Puzzles</a></li>
+                            <li><span class="sub-category">Chew</span></li>
+                            <li><a class="dropdown-item" href="#">Bones</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Products Section -->
+            <div class="col-md-9">
+                <div class="d-flex justify-content-between mb-4">
+                    <span id="productCount">Showing 1-4 of 50 products</span>
+                    <span>Category: All Products</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-4">
+                    <div>
+                        <button class="btn btn-outline-primary layout-btn me-2" id="detailedView">Detailed</button>
+                        <button class="btn btn-outline-primary layout-btn active" id="gridView">Grid</button>
+                    </div>
+                    <select class="form-select w-auto" id="sortSelect">
+                        <option value="bestselling">Bestselling</option>
+                        <option value="score">Score</option>
+                        <option value="newest">Newest</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="price-low">Price: Low to High</option>
+                    </select>
+                </div>
+
+                <!-- Products Container -->
+                <div id="productsContainer" class="row row-cols-1 row-cols-md-4 g-4"></div>
+            </div>
+
+            <!-- Filters Section (unchanged) -->
+            <div class="col-md-3 filters-section">
+                <h5 class="mb-3">Filters</h5>
+                <div class="mb-4">
+                    <h6>Price Range</h6>
+                    <input type="range" class="form-range" min="0" max="100" value="100" id="priceRange">
+                    <small>$0 - $<span id="priceValue">100</span></small>
+                </div>
+                <div>
+                    <h6>Brand</h6>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="brand1" value="brand1">
+                        <label class="form-check-label" for="brand1">PawPerfect</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="brand2" value="brand2">
+                        <label class="form-check-label" for="brand2">PetJoy</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample product data (unchanged)
+        const products = {{ data|safe }};
+
+        // Cart functionality
+        let cartCount = 0;
+        function updateCart(count) {
+            cartCount = count;
+            document.getElementById('cartCount').textContent = cartCount;
+        }
+
+        // Account status
+        const isLoggedIn = false;
+        document.getElementById('accountLink').textContent = isLoggedIn ? 'Profile' : 'Login';
+        document.getElementById('accountLink').href = isLoggedIn ? '/profile' : '/login';
+
+        // Category Dropdown Handling
+        const categoryToggle = document.getElementById('categoryToggle');
+        const categoryMenu = document.getElementById('categoryMenu');
+        const baseCategories = document.querySelectorAll('.base-category');
+
+        categoryToggle.addEventListener('mouseenter', () => {
+            categoryMenu.style.display = 'block';
+        });
+
+        categoryToggle.addEventListener('mouseleave', () => {
+            setTimeout(() => {
+                if (!categoryMenu.matches(':hover')) {
+                    categoryMenu.style.display = 'none';
+                }
+            }, 200);
+        });
+
+        categoryMenu.addEventListener('mouseenter', () => {
+            categoryMenu.style.display = 'block';
+        });
+
+        categoryMenu.addEventListener('mouseleave', () => {
+            categoryMenu.style.display = 'none';
+        });
+
+        baseCategories.forEach(base => {
+            const subMenu = base.nextElementSibling;
+            base.addEventListener('mouseenter', () => {
+                subMenu.style.display = 'block';
+            });
+            base.addEventListener('mouseleave', () => {
+                setTimeout(() => {
+                    if (!subMenu.matches(':hover')) {
+                        subMenu.style.display = 'none';
+                    }
+                }, 200);
+            });
+            subMenu.addEventListener('mouseenter', () => {
+                subMenu.style.display = 'block';
+            });
+            subMenu.addEventListener('mouseleave', () => {
+                subMenu.style.display = 'none';
+            });
+        });
+
+        // Product display
+        function renderProducts(productsToShow, detailed = false) {
+            const container = document.getElementById('productsContainer');
+            container.className = detailed ? 'detailed-view' : 'row row-cols-1 row-cols-md-4 g-4 grid-view';
+            container.innerHTML = '';
+
+            productsToShow.forEach(product => {
+                const categoryPath = product.category.reverse().join(" < ");
+                const card = detailed ? `
+                    <a href="/shop/product_detail/${product.id}" style= "color: black; text-decoration: none;">
+                        <div class="product-card">
+                            <img src="${product.img}" class="product-img" alt="${product.name}">
+                            <div class="product-details">
+                                <h5>${product.name}</h5>
+                                <p class="category-path">${categoryPath}</p>
+                                <p>${product.description}</p>
+                                <p><strong>Price:</strong> $${product.price} | <strong>Weight:</strong> ${product.weight}</p>
+                                <p><strong>In Stock:</strong> ${product.in_stock ? 'Yes' : 'No'} | <strong>Animal:</strong> ${product.animal}</p>
+                                <p><strong>Good For:</strong> ${product.good_for} | <strong>Brand:</strong> ${product.brand}</p>
+
+                            </div>
+                        </div>
+                    </a>
+                    <hr>
+
+                ` : `
+                    <div class="col">
+                        <div class="card product-card">
+                            <a href="/shop/product_detail/${product.id}" style= "color: black; text-decoration: none;">
+                                <img src="${product.img}" class="product-img" alt="${product.name}">
+                                <div class="card-body">
+                                    <h5 class="card-title">${product.name}</h5>
+                                    <p class="card-text">$${product.price}</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+            document.getElementById('productCount').textContent = `Showing 1-${productsToShow.length} of ${products.length} products`;
+        }
+
+        // Sorting function
+        function sortProducts(sortBy) {
+            let sortedProducts = [...products];
+            switch (sortBy) {
+                case 'bestselling':
+                    sortedProducts.sort((a, b) => b.sales - a.sales);
+                    break;
+                case 'score':
+                    sortedProducts.sort((a, b) => b.score - a.score);
+                    break;
+                case 'newest':
+                    sortedProducts.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+                    break;
+                case 'price-high':
+                    sortedProducts.sort((a, b) => b.price - a.price);
+                    break;
+                case 'price-low':
+                    sortedProducts.sort((a, b) => a.price - b.price);
+                    break;
+            }
+            return sortedProducts;
+        }
+
+        // Layout toggle
+        let currentView = 'grid';
+        document.getElementById('detailedView').addEventListener('click', () => {
+            currentView = 'detailed';
+            renderProducts(sortProducts(document.getElementById('sortSelect').value), true);
+            toggleActive('detailedView');
+        });
+
+        document.getElementById('gridView').addEventListener('click', () => {
+            currentView = 'grid';
+            renderProducts(sortProducts(document.getElementById('sortSelect').value), false);
+            toggleActive('gridView');
+        });
+
+        function toggleActive(activeId) {
+            document.querySelectorAll('.layout-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.id === activeId);
+            });
+        }
+
+        // Sort handler
+        document.getElementById('sortSelect').addEventListener('change', (e) => {
+            const sortedProducts = sortProducts(e.target.value);
+            renderProducts(sortedProducts, currentView === 'detailed');
+        });
+
+        // Price filter
+        const priceRange = document.getElementById('priceRange');
+        const priceValue = document.getElementById('priceValue');
+        priceRange.addEventListener('input', () => {
+            priceValue.textContent = priceRange.value;
+        });
+
+        // Initial render
+        renderProducts(products);
+        updateCart(0);
+    </script>
+</body>
+</html>

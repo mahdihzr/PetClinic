@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Shop Admin Panel</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            padding-top: 20px;
+            background-color: #212529;
+        }
+        .main-content {
+            margin-left: 250px;
+            margin-right: 250px;
+            padding: 20px;
+        }
+                .sidebar2 {
+            position: fixed;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 250px;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            padding: 30px 15px;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-link {
+            color: white !important;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            transform: translateX(-5px);
+        }
+
+        .dropdown-menu {
+            display: none;
+            right: 100%;
+            left: auto;
+            top: 0;
+            background-color: #ffffff;
+            border: none;
+            box-shadow: -2px 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            min-width: 200px;
+        }
+
+        .dropdown-item {
+            color: #2c3e50;
+            padding: 10px 20px;
+            position: relative;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #3498db;
+        }
+
+        .dropdown:hover > .dropdown-menu,
+        .dropdown-submenu:hover > .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-submenu {
+            position: relative;
+        }
+
+        .dropdown-submenu .dropdown-menu {
+            right: 100%;
+            left: auto;
+            top: 0;
+        }
+
+        .nav-item {
+            margin: 10px 0;
+        }
+
+        /* Arrow styling */
+        .has-submenu::before {
+            content: "\f053"; /* Left chevron */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .nav-link.has-submenu {
+            padding-left: 30px;
+        }
+
+        .dropdown-item.has-submenu {
+            padding-left: 35px;
+        }
+
+        /* Remove default Bootstrap arrow */
+        .dropdown-toggle::after {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Menu -->
+    <div class="sidebar bg-dark text-white">
+        <h4 class="text-center py-3">Admin Panel</h4>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/shop/admin/category/">Category Manager</a>
+            </li>
+            <li class="nav-item">
+                <div class="dropdown">
+                    <a class="nav-link text-white dropdown-toggle active" href="#" data-bs-toggle="dropdown">
+                        Product Manager
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/shop/admin/manage_product/">Manage</a></li>
+                        <li><a class="dropdown-item" href="/shop/admin/create_product/">Create Product</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#">Comment Manager</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#">User Manager</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Category Section -->
+        <div class="card mb-4">
+            <div class="card-header">Add Category</div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <textarea class="form-control mb-2" name="category" rows="3" placeholder="Enter category name"></textarea>
+                    <button type="submit" class="btn btn-primary">Save Category</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Subcategory Section -->
+        <div class="card mb-4">
+            <div class="card-header">Add Subcategory</div>
+            <div class="card-body">
+                <div class="row">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="col-md-6">
+                            <select name="category2" class="form-select mb-2">
+                                <option>Select Category</option>
+                                {% if categories%}
+                                    {% for category in categories %}
+                                        <option>{{ category}}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <textarea class="form-control mb-2" name="subcategory2" rows="2" placeholder="Enter subcategory name"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Subcategory</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-subcategory Section -->
+        <div class="card mb-4">
+            <div class="card-header">Add Sub-subcategory</div>
+            <div class="card-body">
+                <div class="row">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="col-md-4">
+                            <select id="baseCategory" onchange="showSubcategories()" name="category3" class="form-select mb-2">
+                                <option>Select Subcategory</option>
+                                {% if categories %}
+                                    {% for category in categories %}
+                                        <option>{{ category }}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select id="subCategory" name="subcategory3" class="form-select mb-2">
+                                <option>Select Subcategory</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <textarea name="sub_subcategory3" class="form-control mb-2" rows="2" placeholder="Enter sub-subcategory name"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Sub-subcategory</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+       <!-- Delete Sub-subcategory Section -->
+        <div class="card mb-4">
+            <div class="card-header">Delete Category</div>
+            <div class="card-body">
+                <div class="row">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="col-md-4">
+                            <select id="baseCategory2" onchange="deleteSubcategories()" name="category4" class="form-select mb-2">
+                                <option value="">Select Subcategory</option>
+                                {% if categories %}
+                                    {% for category in categories %}
+                                        <option>{{ category }}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select id="subCategory2" onchange="deleteSubSubcategories()" name="subcategory4" class="form-select mb-2">
+                                <option value="">Select Subcategory</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select id="subSubCategory" name="sub_subcategory4" class="form-select mb-2" >
+                                <option value="">Select Sub_subcategory</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-danger">Delete Sub-subcategory</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+        <script>
+        const categories = {{ categories|safe }};
+
+        function showSubcategories() {
+                const baseCategory = document.getElementById('baseCategory').value;
+                const subCategory = document.getElementById('subCategory');
+
+                subCategory.innerHTML = '<option value="">Select Subcategory</option>';
+
+                if (categories && categories[baseCategory]) {
+                    Object.keys(categories[baseCategory]).forEach(subcat => {
+                        subCategory.innerHTML += `<option>${subcat}</option>`;
+                    });
+                }
+                }
+
+
+        function deleteSubcategories() {
+                const baseCategory = document.getElementById('baseCategory2').value;
+                const subCategory = document.getElementById('subCategory2');
+
+                subCategory.innerHTML = '<option value="">Select Subcategory</option>';
+
+                if (categories && categories[baseCategory]) {
+                    Object.keys(categories[baseCategory]).forEach(subcat => {
+                        subCategory.innerHTML += `<option>${subcat}</option>`;
+                    });
+                }
+                }
+
+
+                // New function for sub-subcategory selection
+        function deleteSubSubcategories() {
+            const baseCategory = document.getElementById('baseCategory2').value;
+            const subCategory = document.getElementById('subCategory2').value;
+            const subSubCategory = document.getElementById('subSubCategory');
+
+            subSubCategory.innerHTML = '<option value="">Select Sub-subcategory</option>';
+
+
+            if (categories && categories[baseCategory] && categories[baseCategory][subCategory]) {
+                categories[baseCategory][subCategory].forEach(subSubCat => {
+                    subSubCategory.innerHTML += `<option value="${subSubCat}">${subSubCat}</option>`;
+                });
+            }
+        }
+        </script>
+
+
+
+
+
+
+
+
+<div class="sidebar2">
+        <ul class="nav flex-column">
+            {% for category in category_obj %}
+            <!-- Main Category: Dog -->
+            <li class="nav-item dropdown">
+                <a class="nav-link has-submenu" href="#" role="button">
+                    {{ category }}
+                </a>
+                {% if category.subcategories.exists %}
+                <ul class="dropdown-menu">
+                    <!-- Subcategory: Dog Food -->
+                    {% for subcategory in category.subcategories.all %}
+
+                    <li class="dropdown-submenu">
+                        <a class="dropdown-item has-submenu" href="#">{{ subcategory }}</a>
+                        {% if subcategory.subcategories.exists %}
+                        <ul class="dropdown-menu">
+                            {% for sub_subcategory in subcategory.subcategories.all %}
+                            <li><a class="dropdown-item" href="#">{{ sub_subcategory }}</a></li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </li>
+
+
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </li>
+
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Bootstrap JS and Basic Functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+</body>
+</html>

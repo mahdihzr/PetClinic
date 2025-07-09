@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Shop Admin - Edit Product</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            padding-top: 20px;
+            background-color: #212529;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .table-responsive {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Menu -->
+    <div class="sidebar bg-dark text-white">
+        <h4 class="text-center py-3">Admin Panel</h4>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/shop/admin/category/">Category Manager</a>
+            </li>
+            <li class="nav-item">
+                <div class="dropdown">
+                    <a class="nav-link text-white dropdown-toggle active" href="#" data-bs-toggle="dropdown">
+                        Product Manager
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/shop/admin/manage_product/">Manage</a></li>
+                        <li><a class="dropdown-item" href="/shop/admin/create_product/">Create Product</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#">Comment Manager</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#">User Manager</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="card">
+            <div class="card-header">Edit Products</div>
+            <div class="card-body">
+                <!-- Search and Filters -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search by name or brand">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" id="categoryFilter" placeholder="Category search">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="stockFilter">
+                            <option value="">All Stock Status</option>
+                            <option value="in">In Stock</option>
+                            <option value="low">Low Stock</option>
+                            <option value="out">Out of Stock</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-secondary w-100" onclick="clearFilters()">Clear Filters</button>
+                    </div>
+                </div>
+
+                <!-- Product Table -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTable">
+                            <!-- Products will be populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Details Modal -->
+    <div class="modal fade" id="productDetailsModal" tabindex="-1" aria-labelledby="productDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productDetailsModalLabel">Product Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img id="modalImage" src="https://via.placeholder.com/150" class="img-fluid mb-2" alt="Product Image">
+                        </div>
+                        <div class="col-md-8">
+                            <p><strong>Name:</strong> <span id="modalName"></span></p>
+                            <p><strong>Category:</strong> <span id="modalCategory"></span></p>
+                            <p><strong>Price:</strong> $<span id="modalPrice"></span></p>
+                            <p><strong>Weight:</strong> <span id="modalWeight"></span> kg</p>
+                            <p><strong>In Stock:</strong> <span id="modalStock"></span></p>
+                            <p><strong>Animal Kind:</strong> <span id="modalAnimal"></span></p>
+                            <p><strong>Good For:</strong> <span id="modalGoodFor"></span></p>
+                            <p><strong>Brand:</strong> <span id="modalBrand"></span></p>
+                            <p><strong>Description:</strong> <span id="modalDescription"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <a href="#" id="editButton" class="btn btn-primary">Edit Product</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Custom Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample product data (in real app, this would come from a database)
+        const products = {{ products|safe }};
+
+        // Show product details in modal
+        function showProductDetails(productId) {
+            const product = products[productId];
+            document.getElementById('modalName').textContent = product.name;
+            document.getElementById('modalCategory').textContent = product.category;
+            document.getElementById('modalPrice').textContent = product.price;
+            document.getElementById('modalWeight').textContent = product.weight;
+            document.getElementById('modalStock').textContent = product.stock;
+            document.getElementById('modalAnimal').textContent = product.animal;
+            document.getElementById('modalGoodFor').textContent = product.goodFor;
+            document.getElementById('modalBrand').textContent = product.brand;
+            document.getElementById('modalDescription').textContent = product.description;
+            document.getElementById('modalImage').src = product.image;
+            document.getElementById('editButton').href = `/shop/admin/edit_product/${productId}`;
+            document.getElementById('productDetailsModalLabel').textContent = `Product Details: ${product.name}`;
+
+            const modal = new bootstrap.Modal(document.getElementById('productDetailsModal'));
+            modal.show();
+        }
+
+        // Filter products with case-insensitive search
+        function filterProducts() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value.toLowerCase();
+            const stock = document.getElementById('stockFilter').value.toLowerCase();
+            const tbody = document.getElementById('productTable');
+            tbody.innerHTML = '';
+
+            Object.keys(products).forEach(id => {
+                const p = products[id];
+                const nameLower = p.name.toLowerCase();
+                const brandLower = p.brand.toLowerCase();
+                const categoryLower = p.category.reverse().join(" < ").toLowerCase();
+
+
+                const matchesSearch = nameLower.includes(search) || brandLower.includes(search);
+                const matchesCategory = !category || categoryLower.includes(category);
+                const stockNum = parseInt(p.stock);
+                const matchesStock = !stock ||
+                    (stock === 'in' && stockNum > 10) ||
+                    (stock === 'low' && stockNum > 0 && stockNum <= 10) ||
+                    (stock === 'out' && stockNum === 0);
+
+                if (matchesSearch && matchesCategory && matchesStock) {
+                    tbody.innerHTML += `
+                        <tr onclick="showProductDetails(${id})">
+                            <td>${p.name}</td>
+                            <td>${p.category}</td>
+                            <td>$${p.price}</td>
+                            <td>${p.stock}</td>
+                            <td><button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); showProductDetails(${id})">View</button></td>
+                        </tr>
+                    `;
+                }
+            });
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('stockFilter').value = '';
+            filterProducts();
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', filterProducts);
+        document.getElementById('categoryFilter').addEventListener('input', filterProducts);
+        document.getElementById('stockFilter').addEventListener('change', filterProducts);
+
+        // Initial load
+        filterProducts();
+    </script>
+</body>
+</html>
